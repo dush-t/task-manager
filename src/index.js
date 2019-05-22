@@ -4,9 +4,10 @@ const express = require('express');
 require('./db/mongoose'); // calling require will ensure that the file runs.
 const userRouter = require('./routers/user');
 const taskRouter = require('./routers/task');
+const config = require('../config/config');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || config.PORT;
 
 app.use(express.json()) // ask express to automatically parse incoming json.
 app.use(userRouter);
