@@ -4,7 +4,7 @@ const express = require('express');
 require('./db/mongoose'); // calling require will ensure that the file runs.
 const userRouter = require('./routers/user');
 const taskRouter = require('./routers/task');
-const config = require('../config/config');
+const config = require('../config/config') || undefined;
 
 const app = express();
 const port = process.env.PORT || config.PORT;
