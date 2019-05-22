@@ -3,7 +3,12 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Task = require('./task');
-const config = require('../../config/config') || undefined;
+try {
+    const config = require('../../config/config');
+} catch (e) {
+    console.log(e);
+}
+
 
 const userSchema = new mongoose.Schema({
     name: {

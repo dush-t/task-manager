@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
-const config = require('../../config/config.js') || undefined;
+try {
+    const config = require('../../config/config.js') || undefined;
+} catch (e) {
+    console.log(e);
+}
+
 
 mongoose.connect(process.env.MONGODB_URL || config.MONGODB_URL, {
     useNewUrlParser: true,
