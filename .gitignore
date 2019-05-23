@@ -2,3 +2,4 @@
 /playground/*
 /config/config.js
 /config/dev.env
+start.sh

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 try {
-    const config = require('../../config/config.js') || undefined;
+    const config = require('../../config/config.js');
 } catch (e) {
     console.log(e);
 }

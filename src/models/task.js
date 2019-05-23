@@ -11,10 +11,10 @@ const taskSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    owner: {
+    relatedRequest: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'User'
+        ref: 'JoinRequest'
     }
 },{
     timestamps: true

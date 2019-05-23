@@ -28,6 +28,16 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    bits_id: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        uppercase: true,
+        validate(value) {
+            
+        }
+    },
     password: {
         type: String,
         required: true,
@@ -56,7 +66,17 @@ const userSchema = new mongoose.Schema({
     }],
     avatar: {
         type: Buffer
-    }
+    },
+    level: {                // level 1 --> Freshers
+        type: Number,       // level 2 --> Second yearites
+        required: true,
+    },
+    clubs: [{
+        club: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Club'
+        }
+    }]
 }, {
     timestamps: true,
 })
@@ -64,10 +84,22 @@ const userSchema = new mongoose.Schema({
 
 
 
-userSchema.virtual('tasks', {
-    ref: 'Task',
+// userSchema.virtual('tasks', {
+//     ref: 'Task',
+//     localField: '_id',
+//     foreignField: 'owner'
+// })
+
+userSchema.virtual('mentored-task', { // mentor mentors the mentee hehehehehe
+    ref: 'JoinRequest',
     localField: '_id',
-    foreignField: 'owner'
+    foreignField: 'mentor'
+})
+
+userSchema.virtual('controlled_clubs', {
+    ref: 'Club',
+    localField: '_id',
+    foreignField: 'mentor'
 })
 
 // Overriding the default method to return user
@@ -85,12 +117,12 @@ userSchema.methods.toJSON = function () {
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign({_id: user._id.toString() }, process.env.JWT_SECRET || config.JWT_SECRET);
-
     user.tokens = user.tokens.concat({ token: token });
     await user.save();
 
     return token;
 }
+
 
 
 userSchema.statics.findByCredentials = async (email, password) => {
@@ -104,21 +136,21 @@ userSchema.statics.findByCredentials = async (email, password) => {
     if(!isMatch) {
         throw new Error('Unable to log in');
     }
-
     return user;
 }
+
 
 
 // Hash password before saving.
 userSchema.pre('save', async function (next) {
     const user = this;
-    
     if (user.isModified('password')) {                          // hash the user's password only if
         user.password = await bcrypt.hash(user.password, 8);    // the password is modified.
     }
-
     next();
 })
+
+    
 
 // Delete user tasks when user is removed.
 userSchema.pre('remove', async function (next) {
