@@ -5,10 +5,10 @@ const JoinRequest = require('../models/JoinRequest');
 // Allow mentor and fresher to delete/create joinRequests.
 // Allow only the mentor to change any joinRequest.
 const checkJoinReqPermission = async (req, res, next) => {
-    const joinRequest = JoinRequest.findById(req.params.join_id);
+    const joinRequest = await JoinRequest.findOne({ _id: req.params.join_id });
 
     if (req.method === "GET") {
-        if (req.user.clubs.includes({ club: joinRequest.club }) || req.user._id === joinRequest.user) {
+        if (req.user.clubs.includes(joinRequest.club) || req.user._id.equals(joinRequest.user)) {
             req.joinRequest = joinRequest;
             next();
         } else {
@@ -18,17 +18,18 @@ const checkJoinReqPermission = async (req, res, next) => {
         }
 
     } else if (req.method === 'POST' || req.method === 'DELETE') {
-        if (req.user._id === joinRequest.mentor || req.user._id === joinRequest.user) {
+        if (req.user._id.equals(joinRequest.mentor) || req.user._id.equals(joinRequest.user)) {
             req.joinRequest = joinRequest;
+            console.log("joinRequest middleware check passed!")
             next();
         } else {
             return res.status(403).send({
-                'error': 'You are not authorized to change this data'
+                'error': 'You are not authorized to change this data lol'
             });
         }
 
     } else {
-        if (req.user._id === joinRequest.mentor) {
+        if (req.user._id.equals(joinRequest.mentor)) {
             req.joinRequest = joinRequest;
             next();
         } else {

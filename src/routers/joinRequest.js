@@ -71,8 +71,8 @@ router.post('/api/join_request/:join_id/approve', auth, level2Check, async (req,
   
     try {
         joinRequest.approve();
-        JoinRequest.findOneAndDelete({ _id: _id });
-        res.send();
+        await JoinRequest.findOneAndDelete({ _id: _id });
+        res.send({'message': 'joinRequest successfully approved'});
     } catch (e) {
         console.log(e);
         res.status(500).send();
@@ -104,6 +104,9 @@ router.delete('/api/join_request/:join_id', auth, checkJoinReqPermission, async 
     try {
         const _id = req.params.join_id;
         await JoinRequest.findOneAndDelete({ _id: _id });
+        res.send({
+            message: 'joinRequest successfully deleted'
+        });
     } catch (e) {
         console.log(e);
         res.status(500).send();
