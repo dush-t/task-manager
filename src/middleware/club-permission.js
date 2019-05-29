@@ -3,8 +3,6 @@ const Club = require('../models/club');
 
 const checkClubPermission = async (req, res, next) => {
     const club = await Club.findOne({ _id: req.params.club_id });
-    console.log(club);
-    // console.log(req.user.clubs);
     if (!club) {
         return res.status(404).send({
             'error': 'The club you are looking for does not exist'
@@ -13,9 +11,8 @@ const checkClubPermission = async (req, res, next) => {
 
     //I have a really bad feeling about this
     const isAllowed = req.user.clubs.some((club) => {
-        return (club.club.toString() === req.params.club_id);
+        return (club._id.toString() === req.params.club_id);
     })
-    console.log(isAllowed);
     if (isAllowed) {
         req.club = club;
         console.log("Middleware check successful");
