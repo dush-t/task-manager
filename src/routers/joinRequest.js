@@ -22,6 +22,11 @@ router.post('/api/join_request/club/:club_id', auth, level2Check, checkClubPermi
         var mentor = club.mentor;    // be used outside the if-else block
     } else {                        
         var user = await User.findOne({bits_id: req.body.bits_id});
+        if (!user) {
+            return res.status(404).send({
+                'error': 'No junior with this id exists'
+            });
+        }
         var mentor = req.user._id;
     }
 
@@ -49,13 +54,13 @@ router.post('/api/join_request/:join_id/approve', auth, level2Check, async (req,
     await joinRequest.populate('club').execPopulate();
 
     if (joinRequest.level === 2) {
-        if (req.user._id !== joinRequest.club.mentor) {
+        if (!req.user._id.equals(joinRequest.club.mentor)) {
             return res.status(403).send({
                 'error': 'You do not have the authority to add this member to the club'
             });
         }
     } else if (joinRequest.level === 1) {
-        if (req.user._id !== joinRequest.mentor) {
+        if (!req.user._id.equals(joinRequest.mentor)) {
             return res.status(403).send({
                 'error': 'You do not have the authority to add this member to the club'
             });
@@ -94,7 +99,7 @@ router.get('/api/join_request/:club_id/all', auth, checkClubPermission, async (r
 
 
 
-
+// DELETE_JOINREQUEST_BY_ID
 router.delete('/api/join_request/:join_id', auth, checkJoinReqPermission, async (req, res) => {
     try {
         const _id = req.params.join_id;

@@ -26,11 +26,24 @@ joinRequestSchema.virtual('tasks', {
 });
 
 joinRequestSchema.methods.approve = async function() {
+    await this.populate('user').execPopulate();
     const user = this.user;
     const club = this.club;
-    user.clubs = user.clubs.concat({ club: club });
+    user.clubs.push(club);
     await user.save();
 }
+
+joinRequestSchema.pre('save', async function (next) {
+    const joinRequest = await JoinRequest.findOne({
+        user: this.user,
+        club: this.club
+    })
+    if (!joinRequest) {
+        next();
+    } else {
+        throw new Error('A join request for this user in this club is already created.');
+    }
+})
 
 const JoinRequest = mongoose.model('JoinRequest', joinRequestSchema);
 

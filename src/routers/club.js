@@ -19,7 +19,7 @@ router.post('/api/clubs', auth, async (req, res) => {
         club.name = req.body.name;
         club.mentor = req.user._id;
         await club.save();
-        req.user.clubs.push({club: club});
+        req.user.clubs.push(club);
         await req.user.save();
         res.status(201).send(club);
     } catch (e) {

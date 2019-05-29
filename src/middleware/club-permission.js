@@ -3,7 +3,7 @@ const Club = require('../models/club');
 
 const checkClubPermission = async (req, res, next) => {
     const club = await Club.findOne({ _id: req.params.club_id });
-    console.log(club.name);
+    console.log(club);
     // console.log(req.user.clubs);
     if (!club) {
         return res.status(404).send({
@@ -18,6 +18,7 @@ const checkClubPermission = async (req, res, next) => {
     console.log(isAllowed);
     if (isAllowed) {
         req.club = club;
+        console.log("Middleware check successful");
         next();
     } else {
         res.status(403).send({
