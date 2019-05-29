@@ -2,6 +2,7 @@ const express = require('express');
 const JoinRequest = require('../models/JoinRequest');
 const auth = require('../middleware/auth');
 const {level2Check, level1Check} = require('../middleware/level');
+const checkClubPermission = require('../middleware/club-permission');
 const multer = require('multer');
 const sharp = require('sharp');
 const Club = require('../models/club');
@@ -54,6 +55,37 @@ router.get('/api/clubs/me', auth, async (req, res) => {
         console.log(e);
         res.status(500).send();
     }
+});
+
+
+
+
+const upload = multer({
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(new Error('Please provide jpg, jpeg or png file'));
+        }
+        cb(undefined, true);
+    }
+});
+router.post('/api/clubs/:club_id/avatar', auth, checkClubPermission, upload.single('avatar'), async (req, res) => {
+    const buffer = await sharp(req.file.buffer).resize({ width: 80, height: 80 }).png().toBuffer();
+    if (req.club.mentor.equals(req.user._id)) {
+        req.club.avatar = buffer;
+        await req.club.save();
+        res.send();
+    } else {
+        res.status(403).send({
+            error: 'You do not have the authority to change the club logo'
+        })
+    }
+}, (error, req, res, next) => {
+    res.status(400).send({
+        error: error.message
+    });
 });
 
 module.exports = router;
