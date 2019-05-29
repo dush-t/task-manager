@@ -11,7 +11,7 @@ const router = new express.Router();
 
 
 // CREATE_TASK
-router.post('/api/:task_id/tasks', auth, level2Check, checkTaskPermission, async (req, res) => {
+router.post('/api/:join_id/tasks', auth, level2Check, checkJoinReqPermission, async (req, res) => {
     
     const task = new Task({
         ...req.body,

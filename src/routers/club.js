@@ -13,12 +13,14 @@ const router = new express.Router();
 
 
 // CREATE_CLUB
-router.post('/api/clubs', auth, (req, res) => {
+router.post('/api/clubs', auth, async (req, res) => {
     try {
         const club = new Club();                    // User who creates club is club-mentor
         club.name = req.body.name;
         club.mentor = req.user._id;
         await club.save();
+        req.user.clubs.push({club: club});
+        await req.user.save();
         res.status(201).send(club);
     } catch (e) {
         console.log(e);
@@ -31,9 +33,9 @@ router.post('/api/clubs', auth, (req, res) => {
 
 
 // LIST_ALL_CLUBS
-router.get('/api/clubs/all', (req, res) => {
+router.get('/api/clubs/all', async (req, res) => {
     try {
-        const clubs = Club.findMany({});
+        const clubs = await Club.find({});
         res.send(clubs);
     } catch (e) {
         console.log(e);
@@ -44,25 +46,14 @@ router.get('/api/clubs/all', (req, res) => {
 
 
 // LIST_USER_CLUBS
-router.get('/api/clubs/me', auth, (req, res) => {
+router.get('/api/clubs/me', auth, async (req, res) => {
     try {
-        await req.user.populate('clubs').execPopulate();
+        await req.user.populate('clubs.club').execPopulate();
         res.send(req.user.clubs);
     } catch (e) {
         console.log(e);
         res.status(500).send();
     }
 });
-
-
-
-
-// APPROVE_JOIN_REQUEST
-
-
-
-
-
-
 
 module.exports = router;

@@ -9,6 +9,7 @@ const checkJoinReqPermission = async (req, res, next) => {
 
     if (req.method === "GET") {
         if (req.user.clubs.includes({ club: joinRequest.club }) || req.user._id === joinRequest.user) {
+            req.joinRequest = joinRequest;
             next();
         } else {
             return res.status(403).send({
@@ -18,6 +19,7 @@ const checkJoinReqPermission = async (req, res, next) => {
 
     } else if (req.method === 'POST' || req.method === 'DELETE') {
         if (req.user._id === joinRequest.mentor || req.user._id === joinRequest.user) {
+            req.joinRequest = joinRequest;
             next();
         } else {
             return res.status(403).send({
@@ -27,6 +29,7 @@ const checkJoinReqPermission = async (req, res, next) => {
 
     } else {
         if (req.user._id === joinRequest.mentor) {
+            req.joinRequest = joinRequest;
             next();
         } else {
             return res.status(403).send({

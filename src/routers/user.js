@@ -21,6 +21,8 @@ router.post('/users', async (req, res) => {
 });
 
 
+
+
 router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password);
@@ -30,6 +32,9 @@ router.post('/users/login', async (req, res) => {
         res.status(400).send();
     }
 });
+
+
+
 
 router.post('/users/logout', auth, async (req, res) => {
     try {
@@ -43,6 +48,9 @@ router.post('/users/logout', auth, async (req, res) => {
     }
 })
 
+
+
+
 router.post('/logout_all', auth, async (req, res) => {
     try {
         req.user.tokens = [];
@@ -54,9 +62,13 @@ router.post('/logout_all', auth, async (req, res) => {
 });
 
 
+
+
 router.get('/users/me', auth, async (req, res) => {
     res.send(req.user);
 });
+
+
 
 
 router.patch('/users/me', auth, async (req, res) => {
@@ -86,6 +98,7 @@ router.patch('/users/me', auth, async (req, res) => {
 
  
 
+
 router.delete('/users/me', auth, async (req, res) => {
     try {
         await req.user.remove();
@@ -95,6 +108,8 @@ router.delete('/users/me', auth, async (req, res) => {
         res.status(500).send();
     }
 })
+
+
 
 
 const upload = multer({                 // No dest parameter provided because we
@@ -110,7 +125,6 @@ const upload = multer({                 // No dest parameter provided because we
     }
 
 })
-
 // take image --> resize to 250x250 --> convert to png --> save as user avatar.
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
     const buffer = await sharp(req.file.buffer).resize({ width: 250, height:250 }).png().toBuffer()
@@ -121,11 +135,17 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
     res.status(400).send({ error: error.message });
 })
 
+
+
+
 router.delete('/users/me/avatar', auth, async (req, res) => {
     req.user.avatar = undefined;
     await req.user.save();
     res.send();
 })
+
+
+
 
 router.get('/users/:id/avatar', async (req, res) => {
     try {

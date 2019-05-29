@@ -23,7 +23,7 @@ clubSchema.virtual('members', {
 
 clubSchema.virtual('joinRequests', {
     ref: 'JoinRequest',
-    localfield: '_id',
+    localField: '_id',                       // fuck camel case
     foreignField: 'club'
 })
 

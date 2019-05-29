@@ -1,5 +1,6 @@
 const express = require('express');
 const JoinRequest = require('../models/JoinRequest');
+const User = require('../models/user');
 const auth = require('../middleware/auth');
 const {level2Check, level1Check} = require('../middleware/level');
 const checkJoinReqPermission = require('../middleware/joinRequest-permission');
@@ -10,9 +11,8 @@ const router = new express.Router();
 
 // REQUEST_TO_JOIN_CLUB
 // can only be made by second-yearites.
-router.post('/api/join_request/club/:club_id', auth, level2Check, (req, res) => {
-    const _id = req.params.club_id;
-    const club = await Club.findById(_id);
+router.post('/api/join_request/club/:club_id', auth, level2Check, checkClubPermission, async (req, res) => {
+    const club = req.club;
     if (!club) {
         return res.status(404).send({'error': 'This club does not exist'});
     }
@@ -43,7 +43,7 @@ router.post('/api/join_request/club/:club_id', auth, level2Check, (req, res) => 
 
 
 //APPROVE_JOIN_REQUEST
-router.post('/api/join_request/:join_id/approve', auth, level2Check, (req, res) => {
+router.post('/api/join_request/:join_id/approve', auth, level2Check, async (req, res) => {
     const _id = req.params.join_id;
     const joinRequest = await JoinRequest.findById(_id);
     await joinRequest.populate('club').execPopulate();
@@ -76,13 +76,13 @@ router.post('/api/join_request/:join_id/approve', auth, level2Check, (req, res) 
 
 
 // LIST_ALL_JOINREQUESTS_OF_CLUB
-router.get('/api/join_request/:club_id/all', auth, checkClubPermission, (req, res) => {
+router.get('/api/join_request/:club_id/all', auth, checkClubPermission, async (req, res) => {
     try {
         const club = req.club;
         await club.populate({
             path: 'joinRequests',
             match: {
-                level = parseInt(req.query.level);
+                level: parseInt(req.query.level)
             }
         }).execPopulate();
         res.send(club.joinRequests);
@@ -95,10 +95,10 @@ router.get('/api/join_request/:club_id/all', auth, checkClubPermission, (req, re
 
 
 
-router.delete('/api/join_request/:join_id', auth, checkJoinReqPermission, (req, res) => {
+router.delete('/api/join_request/:join_id', auth, checkJoinReqPermission, async (req, res) => {
     try {
         const _id = req.params.join_id;
-        JoinRequest.findOneAndDelete({ _id: _id });
+        await JoinRequest.findOneAndDelete({ _id: _id });
     } catch (e) {
         console.log(e);
         res.status(500).send();
@@ -106,3 +106,4 @@ router.delete('/api/join_request/:join_id', auth, checkJoinReqPermission, (req, 
 })
 
 
+module.exports = router;
