@@ -19,3 +19,10 @@ and to start it in production mode, run `./start_template.sh start`. For develop
 2. Create a new pull request for each new feature.
 3. If you fixed an issue, reference the issue number as _issue#<issue_number>_ in your commit message.
 4. Write clear, concise commit messages.
+
+## TO-DO - 
+1. Write front-end for web app.
+2. Write tests for the api.
+3. Write a new rounds feature, such that clubs can add juniors to rounds and then specify if a junior passed the current round 
+or not. Think of recruitment process of clubs like Hindi Drama Club, which are not task based.
+4. Write chat feature using socket.io (Not important as of now).
