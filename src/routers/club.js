@@ -59,7 +59,7 @@ router.get('/api/clubs/me', auth, async (req, res) => {
 
 
 
-
+// UPLOAD_CLUB_LOGO
 const upload = multer({
     limits: {
         fileSize: 1000000
@@ -71,10 +71,10 @@ const upload = multer({
         cb(undefined, true);
     }
 });
-router.post('/api/clubs/:club_id/avatar', auth, checkClubPermission, upload.single('avatar'), async (req, res) => {
+router.post('/api/clubs/:club_id/logo', auth, checkClubPermission, upload.single('logo'), async (req, res) => {
     const buffer = await sharp(req.file.buffer).resize({ width: 80, height: 80 }).png().toBuffer();
     if (req.club.mentor.equals(req.user._id)) {
-        req.club.avatar = buffer;
+        req.club.logo = buffer;
         await req.club.save();
         res.send();
     } else {
@@ -87,5 +87,24 @@ router.post('/api/clubs/:club_id/avatar', auth, checkClubPermission, upload.sing
         error: error.message
     });
 });
+
+
+
+// VIEW_CLUB_LOGO
+router.get('/club/:club_id/logo.png', async (req, res) => {
+    try {
+        const club = await Club.findById(req.params.club_id);
+        if (!club || !club.logo) {
+            return res.status(404).send();
+        }
+        res.set('Content-Type', 'image/png');
+        res.send(club.logo);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send();
+    }
+
+})
+
 
 module.exports = router;

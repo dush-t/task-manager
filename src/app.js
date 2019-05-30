@@ -9,7 +9,14 @@ const joinRequestRouter = require('./routers/joinRequest');
 
 const app = express();
 
+// log all requests to terminal, just like django.
+const loggerMiddleware = (req, res, next) => {
+    console.log(req.method + ' ' + req.path);
+    next();
+}
+
 app.use(express.json()) // ask express to automatically parse incoming json.
+app.use(loggerMiddleware);
 app.use(userRouter);
 app.use(taskRouter);
 app.use(clubRouter);

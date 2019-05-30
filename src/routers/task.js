@@ -15,7 +15,7 @@ router.post('/api/:join_id/tasks', auth, level2Check, checkJoinReqPermission, as
     
     const task = new Task({
         ...req.body,
-        relatedRequest: req.joinRequest
+        relatedRequest: req.joinRequest._id
     })
     
     try {
@@ -69,8 +69,8 @@ router.get('/api/tasks/:join_id', auth, checkJoinReqPermission, async (req, res)
 
 
 // VIEW_TASK_BY_ID
-router.get('/api/tasks/:id', auth, checkTaskPermission, async (req, res) => {
-    const _id = req.params.id;   
+router.get('/api/tasks/:task_id', auth, checkTaskPermission, async (req, res) => {
+    const _id = req.params.task_id;   
     try {
         //const task = await Task.findById(_id);
         const task = await Task.findOne({ _id: _id, relatedRequest: req.joinRequest._id });

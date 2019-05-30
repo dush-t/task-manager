@@ -1,5 +1,5 @@
 const level2Check = async (req, res, next) => {
-    if (req.user.level === 2) {
+    if (req.user.level > 1) {
         next();
     } else {
         return res.status(403).send({
