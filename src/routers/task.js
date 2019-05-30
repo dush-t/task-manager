@@ -45,11 +45,11 @@ router.get('/api/tasks/:join_id', auth, checkJoinReqPermission, async (req, res)
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
     }
     
-    const joinRequest = JoinRequest.findById(req.params.join_id);
+    const joinRequest = req.joinRequest;    
 
     try {
         // const tasks = await Task.find({owner: req.user._id});
-        joinRequest.populate({
+        await joinRequest.populate({
             path: 'tasks',
             match: match,
             options: {
@@ -61,6 +61,7 @@ router.get('/api/tasks/:join_id', auth, checkJoinReqPermission, async (req, res)
         res.send(joinRequest.tasks);
 
     } catch (e) {
+        console.log(e);
         res.status(500).send();
     }
 })
@@ -69,7 +70,7 @@ router.get('/api/tasks/:join_id', auth, checkJoinReqPermission, async (req, res)
 
 
 // VIEW_TASK_BY_ID
-router.get('/api/tasks/:task_id', auth, checkTaskPermission, async (req, res) => {
+router.get('/api/task/:task_id', auth, checkTaskPermission, async (req, res) => {
     const _id = req.params.task_id;   
     try {
         //const task = await Task.findById(_id);
@@ -102,7 +103,7 @@ router.patch('/api/tasks/:task_id', auth, level2Check, checkTaskPermission, asyn
 
     try {
         // const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        const task = await Task.findOne({ _id: req.params.id, relatedRequest: req.joinRequest._id });
+        const task = req.task;
         
         if (!task) {
             return res.status(404).send();
@@ -127,7 +128,7 @@ router.patch('/api/tasks/:task_id', auth, level2Check, checkTaskPermission, asyn
 router.delete('/api/tasks/:task_id', auth, level2Check, checkTaskPermission, async (req, res) => {
     try {
         // const task = await Task.findByIdAndDelete(req.params.id);
-        const task = await Task.findOneAndDelete({ _id: req.params.id, relatedRequest: req.joinRequest._id });
+        const task = await Task.findOneAndDelete({ _id: req.params.task_id, relatedRequest: req.joinRequest._id });
 
         if (!task) {
             return res.status(404).send();

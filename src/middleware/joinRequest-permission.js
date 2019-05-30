@@ -8,8 +8,14 @@ const checkJoinReqPermission = async (req, res, next) => {
     const joinRequest = await JoinRequest.findOne({ _id: req.params.join_id });
 
     if (req.method === "GET") {
-        if (req.user.clubs.includes(joinRequest.club) || req.user._id.equals(joinRequest.user)) {
+
+        const isAllowed = req.user.clubs.some((club) => {
+            return (club._id.equals(joinRequest.club))
+        }) || req.user._id.equals(joinRequest.user);
+
+        if (isAllowed) {
             req.joinRequest = joinRequest;
+            console.log("joinRequest middleware check passed!");
             next();
         } else {
             return res.status(403).send({
@@ -20,7 +26,7 @@ const checkJoinReqPermission = async (req, res, next) => {
     } else if (req.method === 'POST' || req.method === 'DELETE') {
         if (req.user._id.equals(joinRequest.mentor) || req.user._id.equals(joinRequest.user)) {
             req.joinRequest = joinRequest;
-            console.log("joinRequest middleware check passed!")
+            console.log("joinRequest middleware check passed!");
             next();
         } else {
             return res.status(403).send({
