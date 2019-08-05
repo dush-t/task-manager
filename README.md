@@ -1,5 +1,5 @@
 # task-manager
-API for a recruitment app for clubs and departments at BITS Pilani.
+RESTful API - powered by node.js - for a recruitments portal for technical clubs and departments of BITS Pilani
 
 
 ## Setup - 
